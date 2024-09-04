@@ -1,8 +1,13 @@
 import createHttpError from 'http-errors';
-import { getAllContacts, getContactById } from '../services/contacts.js';
+import {
+  createContact,
+  getAllContacts,
+  getContactById,
+} from '../services/contacts.js';
 
-const getContacts = async (req, res) => {
+export const getContactsController = async (req, res) => {
   const contacts = await getAllContacts();
+
   res.json({
     status: 200,
     message: 'Successfully found contacts!',
@@ -10,25 +15,27 @@ const getContacts = async (req, res) => {
   });
 };
 
-const getOneContact = async (req, res) => {
+export const getOneContactController = async (req, res) => {
   const { contactId } = req.params;
   const contact = await getContactById(contactId);
 
   if (!contact) {
-    // res.status(404).json({
-    //   message: 'Sorry, but we don`t have such a contact!',
-    // });
-
-      throw createHttpError(404, 'Sorry, but we don`t have such a contact!')
+    throw createHttpError(404, 'Sorry, but we don`t have such a contact!');
   }
-
 
   res.json({
     status: 200,
     message: 'Successfully found contacts!',
     data: contact,
   });
-  next(error);
 };
 
-export { getContacts, getOneContact };
+export const createContactController = async (req, res) => {
+  const contact = await createContact(req.body);
+
+  res.json({
+    status: 201,
+    message: `Successfully created a contact!`,
+    data: contact,
+  });
+};
