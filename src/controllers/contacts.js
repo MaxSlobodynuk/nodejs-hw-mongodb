@@ -1,8 +1,10 @@
 import createHttpError from 'http-errors';
 import {
   createContact,
+  deleteContact,
   getAllContacts,
   getContactById,
+  updateContact,
 } from '../services/contacts.js';
 
 export const getContactsController = async (req, res) => {
@@ -38,4 +40,31 @@ export const createContactController = async (req, res) => {
     message: `Successfully created a contact!`,
     data: contact,
   });
+};
+
+export const patchContactController = async (req, res) => {
+  const { contactId } = req.params;
+  const result = await updateContact(contactId, req.body);
+  console.log(result.contact)
+
+  if (!result) {
+    throw createHttpError(404, 'Sorry, but we don`t have such a contact!');
+  }
+
+  return res.json({
+    status: 200,
+    message: 'Successfully patched a contact!',
+    data: result.contact,
+  });
+};
+
+export const deleteContactController = async (req, res) => {
+  const { contactId } = req.params;
+  const contact = await deleteContact(contactId);
+
+  if (!contact) {
+    throw createHttpError(404, 'Sorry, but we don`t have such a contact!');
+  }
+
+  res.status(204).end();
 };
