@@ -32,7 +32,7 @@ export const getOneContactController = async (req, res) => {
   });
 };
 
-export const createContactController = async (req, res) => {
+export const createContactController = async (req, res, next) => {
   const contact = await createContact(req.body);
 
   res.json({
@@ -46,13 +46,9 @@ export const patchContactController = async (req, res) => {
   const { contactId } = req.params;
   const result = await updateContact(contactId, req.body);
 
-  console.log(result);
-
   if (!result) {
     throw createHttpError(404, 'Sorry, but we don`t have such a contact!');
   }
-
-  // console.log(result);
 
   return res.json({
     status: 200,
