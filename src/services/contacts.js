@@ -1,9 +1,26 @@
 import { Contact } from '../db/models/contact.js';
 
-export const getAllContacts = async () => {
-  const contacts = await Contact.find();
+export const getAllContacts = async ({ page, perPage }) => {
+  console.log({ page, perPage });
+  const limit = perPage;
+  const skip = page > 0 ? (page - 1) * perPage : 0;
 
-  return contacts;
+  const [contacts, count] = await Promise.all([
+    Contact.find().skip(skip).limit(limit).exec(),
+    Contact.countDocuments(),
+  ]);
+
+  const totalPages = Math.ceil(count / perPage);
+
+  return {
+    data: contacts,
+    page,
+    perPage,
+    totalItems: count,
+    totalPages: totalPages,
+    hasNextPage: Boolean(totalPages - page),
+    hasPreviousPage: page > 1,
+  };
 };
 
 export const getContactById = async (contactId) => {
@@ -36,8 +53,6 @@ export const updateContact = async (contactId, payload, options = {}) => {
       ...options,
     },
   );
-
-  // console.log('Raw result:', rawResult);
 
   if (!rawResult || !rawResult.value) return null;
 
