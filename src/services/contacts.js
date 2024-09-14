@@ -1,12 +1,11 @@
 import { Contact } from '../db/models/contact.js';
 
-export const getAllContacts = async ({ page, perPage }) => {
-  console.log({ page, perPage });
+export const getAllContacts = async ({ page, perPage, sortOrder, sortBy }) => {
   const limit = perPage;
   const skip = page > 0 ? (page - 1) * perPage : 0;
 
   const [contacts, count] = await Promise.all([
-    Contact.find().skip(skip).limit(limit).exec(),
+    Contact.find().skip(skip).limit(limit).sort({ [sortBy]: sortOrder }).exec(),
     Contact.countDocuments(),
   ]);
 
