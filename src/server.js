@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieParser from 'cookie-parser'
 import pino from 'pino-http';
 import cors from 'cors';
 import { env } from './utils/env.js';
@@ -9,6 +10,7 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 
 const setupServer = () => {
   const app = express();
+  app.use(cookieParser());
 
   const PORT = Number(env('PORT', '3000'));
 

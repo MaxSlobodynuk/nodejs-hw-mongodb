@@ -3,24 +3,25 @@ import { model, Schema } from 'mongoose';
 const sessionSchema = new Schema(
   {
     userId: {
-      type: String,
-      require: true,
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
     },
     accessToken: {
       type: String,
-      require: true,
+      required: true,
     },
     refreshToken: {
       type: String,
-      require: true,
+      required: true,
     },
     accessTokenValidUntil: {
       type: Date,
-      require: true,
+      required: true,
     },
     refreshTokenValidUntil: {
       type: Date,
-      require: true,
+      required: true,
     },
   },
   {
