@@ -20,7 +20,7 @@ export const getAllContacts = async ({
       .limit(limit)
       .sort({ [sortBy]: sortOrder })
       .exec(),
-    Contact.countDocuments(),
+    Contact.countDocuments({ userId }),
   ]);
 
   const totalPages = Math.ceil(count / perPage);

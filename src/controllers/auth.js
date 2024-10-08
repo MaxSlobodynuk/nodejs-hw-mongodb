@@ -35,7 +35,7 @@ export const userLogin = async (req, res) => {
   res.json({
     status: 200,
     message: 'Successfully logged in an user!',
-    data: session.accessToken,
+    data: { accessToken: session.accessToken },
   });
 };
 

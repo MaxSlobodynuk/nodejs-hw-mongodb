@@ -18,9 +18,10 @@ const createSession = () => {
 };
 
 export const registerUser = async (user) => {
-  const maybeUser = User.findOne({ email: user.email });
+  const maybeUser = await User.findOne({ email: user.email });
+  console.log({maybeUser});
 
-  if (!maybeUser) {
+  if (maybeUser) {
     throw createHttpError(409, 'Email in use');
   }
 
