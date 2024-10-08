@@ -14,7 +14,13 @@ export const getContactsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query);
 
-  const contacts = await getAllContacts({ page, perPage, sortBy, sortOrder });
+  const contacts = await getAllContacts({
+    page,
+    perPage,
+    sortBy,
+    sortOrder,
+    userId: req.user._id,
+  });
 
   res.json({
     status: 200,
@@ -25,7 +31,7 @@ export const getContactsController = async (req, res) => {
 
 export const getOneContactController = async (req, res) => {
   const { contactId } = req.params;
-  const contact = await getContactById(contactId);
+  const contact = await getContactById(contactId, req.user._id);
 
   if (!contact) {
     throw createHttpError(404, 'Sorry, but we don`t have such a contact!');
@@ -39,18 +45,23 @@ export const getOneContactController = async (req, res) => {
 };
 
 export const createContactController = async (req, res, next) => {
-  const contact = await createContact(req.body);
+  const contact = {
+    ...req.body,
+    userId: req.user._id,
+  };
+
+  const createdContact = await createContact(contact);
 
   res.json({
     status: 201,
     message: `Successfully created a contact!`,
-    data: contact,
+    data: createdContact,
   });
 };
 
 export const patchContactController = async (req, res) => {
   const { contactId } = req.params;
-  const result = await updateContact(contactId, req.body);
+  const result = await updateContact(contactId, req.user._id, req.body);
 
   if (!result) {
     throw createHttpError(404, 'Sorry, but we don`t have such a contact!');
@@ -65,7 +76,7 @@ export const patchContactController = async (req, res) => {
 
 export const deleteContactController = async (req, res) => {
   const { contactId } = req.params;
-  const contact = await deleteContact(contactId);
+  const contact = await deleteContact(contactId, req.user._id);
 
   if (!contact) {
     throw createHttpError(404, 'Sorry, but we don`t have such a contact!');
