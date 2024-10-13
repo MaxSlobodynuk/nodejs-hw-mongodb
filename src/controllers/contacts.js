@@ -9,6 +9,10 @@ import {
 
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { env } from '../utils/env.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+const enableCloudinary = env('ENABLE_CLOUDINARY');
 
 export const getContactsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
@@ -45,9 +49,20 @@ export const getOneContactController = async (req, res) => {
 };
 
 export const createContactController = async (req, res, next) => {
+  let photoUrl;
+
+  if (req.file) {
+    if (enableCloudinary === 'true') {
+      photoUrl = await saveFileToCloudinary(req.file, 'photos');
+    } else {
+      photoUrl = await saveFileToUploadDir(req.file);
+    }
+  }
+
   const contact = {
     ...req.body,
     userId: req.user._id,
+    photo: photoUrl,
   };
 
   const createdContact = await createContact(contact);
@@ -61,7 +76,18 @@ export const createContactController = async (req, res, next) => {
 
 export const patchContactController = async (req, res) => {
   const { contactId } = req.params;
-  const result = await updateContact(contactId, req.user._id, req.body);
+  let photoUrl;
+
+  if (req.file) {
+    photoUrl = await saveFileToUploadDir(req.file);
+  }
+
+  const result = await updateContact(
+    contactId,
+    req.user._id,
+    req.body,
+    photoUrl,
+  );
 
   if (!result) {
     throw createHttpError(404, 'Sorry, but we don`t have such a contact!');
