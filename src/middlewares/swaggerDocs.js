@@ -7,9 +7,10 @@ import { SWAGGER_PATH } from '../constants/index.js';
 export const swaggerDocs = () => {
   try {
     const swaggerDoc = readFileSync(SWAGGER_PATH, "utf-8");
-    swaggerData = JSON.parse(swaggerDoc);
+    const swaggerData = JSON.parse(swaggerDoc);
     return [...swaggerUI.serve, swaggerUI.setup(swaggerData)];
   } catch (error) {
+    console.log(error)
     return (req, res, next) =>
       next(createHttpError(500, "Can't load swagger docs"));
   }
