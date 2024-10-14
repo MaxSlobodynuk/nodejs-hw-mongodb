@@ -1,0 +1,89 @@
+tags:
+  - Contacts
+summary: Update contact by id
+operationId: updateContactById
+description: 'Update contact by id'
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: contactId
+    required: true
+    schema:
+      type: string
+      example: '66d1a08277df1f701522be35'
+requestBody:
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        properties:
+          _id:
+            description: "Contact's id"
+            type: string
+            example: 66d1a08277df1f701522be38
+          name:
+            description: "Contact's name"
+            type: string
+            example: 'John Doe'
+          phoneNumber:
+            description: "Contact's phone number"
+            type: string
+            example: 324-84-15
+          email:
+            description: "Contact's email"
+            type: string
+            example: buhaichuk@mail.com
+          isFavorite:
+            description: 'Favorite contact'
+            type: boolean
+            example: true
+          contactType:
+            description: 'Which group contact belongs to'
+            type: string
+            enum: ['work', 'home', 'personal']
+            example: 'work'
+          userId:
+            description: "Contact's parent id"
+            type: string
+            example: 66e44f1689959db712a689b6
+          photo:
+            description: "Link to contact's photo"
+            type: string
+            format: binary
+responses:
+  '200':
+    description: 'Get contact by id'
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully patched a contact!
+            data:
+              type: object
+              $ref: '../../components/schemas/contact.yaml'
+  '401':
+    $ref: '../../components/responses/401.yaml'
+  '404':
+    description: 'Contact not found'
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 404
+            message:
+              type: string
+              example: 'Contact not found'

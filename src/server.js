@@ -7,11 +7,13 @@ import contactRoutes from './routers/contacts.js';
 import authRoutes from './routers/auth.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import { swaggerDocs } from './middlewares/swaggerDocs.js';
 
 const setupServer = () => {
   const app = express();
   app.use(cookieParser());
   app.use(express.static('uploads'));
+  app.use('/api-docs', swaggerDocs());
 
   const PORT = Number(env('PORT', '3000'));
 
