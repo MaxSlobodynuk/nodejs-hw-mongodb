@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import crypto from 'node:crypto';
+import crypto, { randomBytes } from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import path from 'node:path';
 import fs from 'node:fs/promises';
@@ -17,6 +17,7 @@ import {
 } from '../constants/index.js';
 import { sendMail } from '../utils/sendMail.js';
 import { env } from '../utils/env.js';
+import { validateCode } from '../utils/googleOAuth2.js';
 
 const createSession = () => {
   const accessToken = crypto.randomBytes(30).toString('base64');
@@ -161,4 +162,29 @@ export const resetPwd = async (password, token) => {
 
     throw error;
   }
+};
+
+export const loginOrSignupWithGoogle = async (code) => {
+  const loginTicket = await validateCode(code);
+  const payload = loginTicket.getPayload();
+
+  if (!payload) throw createHttpError(401);
+
+  let user = await User.findOne({ email: payload.email });
+
+  if (!user) {
+    const password = await bcrypt.hash(randomBytes(10), 10);
+    user = await User.create({
+      email: payload.email,
+      name: payload.name,
+      password,
+    });
+  }
+
+  const newSession = createSession();
+
+  return await Session.create({
+    userId: user._id,
+    ...newSession,
+  });
 };
